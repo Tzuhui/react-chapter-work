@@ -7,15 +7,27 @@ export const initState = {
 }
 
 export const cartReducer = (state, action) => {
-  // 判斷指令
+  let newCartList =  [...state.cartList];
+  const index = state.cartList.findIndex(item => item.id === action.payload.id)
   switch (action.type) {
     case 'ADD_TO_CART':
-      let newArray =  [...state.cartList];
-      newArray.push(action.payload)
+      if (index > -1) {
+        newCartList[index].qty += 1;
+      } else {
+        newCartList.push(action.payload)
+      }
       return {
         ...state,
-        cartList: newArray,
+        cartList: newCartList,
         total: state.total + action.payload.price
+      }
+    case 'CHANGE_CART_QTY':
+      newCartList[index].qty = parseInt(action.payload.qty);
+      const totalPrice = newCartList.map(c => c.price * c.qty).reduce((previous, current) => previous + current);
+      return {
+        ...state,
+        cartList: newCartList,
+        total: totalPrice
       }
     default:
       return state

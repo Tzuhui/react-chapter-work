@@ -1,9 +1,13 @@
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import { ParentContext } from '../store';
 
 const Cart = () => {
-  const [state] = useContext(ParentContext);
-  console.log("Cart")
+  const [state, dispatch] = useContext(ParentContext);
+  const changeCartQty = (e) => {
+    const qty = e.target.value;
+    const target = e.target.dataset.id;
+    dispatch({ type: 'CHANGE_CART_QTY', payload: {id: target, qty: qty} });
+  }
   return (
     <div className="bg-light p-4 my-4">
       {state.cartList.length === 0 ? (
@@ -13,22 +17,19 @@ const Cart = () => {
           <tbody>
             {state.cartList.map((item, index) => (
               <tr key={`${item.id}_${index}`}>
-                <td width="100">
-                  <a href="/" className="text-dark">
-                    <i className="fas fa-times"></i>
-                  </a>
-                </td>
                 <td style={{ width: '100px' }}>
                   <img src={item.img} className="table-image" alt="" />
                 </td>
-                <td>{item.title}</td>
-                <td width="200">
-                  <select name="" id="" className="form-select">
-                    <option value="1">1</option>
+                <td width="200">{item.title}<br /><small className='text-muted'>NT$ {item.price}</small></td>
+                <td width="150">
+                  <select value={item.qty} className="form-select" data-id={item.id} onChange={changeCartQty}>
+                    {
+                      [...new Array(20)].map((_, i) => <option key={`option_${i}`} value={i + 1}>{i+ 1}</option>)
+                    }
                   </select>
                 </td>
-                <td width="200" className="text-end">
-                  NT$ {item.price}
+                <td width="150" className="text-end">
+                  NT$ {item.price * item.qty}
                 </td>
               </tr>
             ))}
